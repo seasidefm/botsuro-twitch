@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: seasidefm
+  name: botsuro-twitch
+  labels:
+    app: botsuro-twitch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: botsuro-twitch
+  template:
+    metadata:
+      labels:
+        app: botsuro-twitch
+    spec:
+      containers:
+        - name: botsuro-twitch
+          # Add your own personal registry here
+          image: registry.dougflynn.dev/botsuro:latest
+          imagePullPolicy: Always
+          env:
+            - name: BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: BOT_TOKEN
+            - name: CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: CHANNEL
+            - name: MONGO_CONNECTION
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: MONGO_CONNECTION
+      imagePullSecrets:
+        - name: regcred

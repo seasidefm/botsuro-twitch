@@ -1,0 +1,10 @@
+twitchio~=2.1.4
+black
+pylint
+python-dotenv~=0.19.2
+pymongo[srv,tls]==3.12
+sanic~=21.12.1
+Flask
+waitress
+sentry-sdk[flask]
+paho-mqtt~=1.6.1

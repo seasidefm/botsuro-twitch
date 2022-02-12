@@ -1,0 +1,18 @@
+version: "3"
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - .env
+  botsuro-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - "./:/app"
