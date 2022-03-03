@@ -1,3 +1,4 @@
+import datetime
 import os
 import string
 import time
@@ -6,7 +7,7 @@ from bson.json_util import dumps
 from json import loads
 
 from pymongo import MongoClient
-from utils import SongRequest
+from utils import SongRequest, UserPayload
 
 TEMP_MOVIE_DETAILS = """
 Title: Maison Ikkoku |
@@ -47,14 +48,30 @@ class DB:
         requests = self.collection.find({"complete": {"$ne": True}})
         return loads(dumps(list(requests)))
 
-    async def __song_saver(self, user: str, song_to_add: dict):
+    async def __super_saver(self, user: UserPayload, song_to_superfave):
+        super_faves = self.db.get_collection('super_faves')
+        already_superfaved = super_faves.find_one({"user": user['user'], "song": song_to_superfave})
+
+        if already_superfaved is None:
+            super_faves.insert_one({
+                    "user": user["user"],
+                    "twitch_id": user["user_id"],
+                    "song": song_to_superfave,
+                    "date": int(time.time())
+                })
+            return "added"
+        else:
+            return "already_exists"
+
+    async def __song_saver(self, user: UserPayload, song_to_add: dict):
         fave_songs = self.db.get_collection('saved_songs')
-        user_list = fave_songs.find({"user": user})
+        user_list = fave_songs.find({"user": user['user']})
         results = list(user_list)
         if len(results) == 0:
             print(f"User list not found for {user}, creating...")
             res = fave_songs.insert_one({
-                "user": user,
+                "user": user['user'],
+                "twitch_id": user['user_id'],
                 "songs": [{
                     "song": song_to_add,
                     "date": int(time.time())
@@ -76,10 +93,11 @@ class DB:
                 }]
                 fave_songs.update_one({
                     "user": {
-                        "$eq": user
+                        "$eq": user['user']
                     }
                 }, {
                     "$set": {
+                        "twitch_id": user['user_id'],
                         "songs": new_song_list
                     }
                 })
@@ -87,13 +105,19 @@ class DB:
             else:
                 return "already_exists"
 
-    async def save_current_song(self, user: str):
+    async def super_fave_song(self, user: UserPayload):
+        current_song = (await self.current_song())['song_string']
+        if current_song == "":
+            return "no_song"
+        return await self.__super_saver(user, current_song)
+
+    async def save_current_song(self, user: UserPayload):
         current_song = (await self.current_song())['song_string']
         if current_song == "":
             return "no_song"
         return await self.__song_saver(user, current_song)
 
-    async def save_last_song(self, user: str):
+    async def save_last_song(self, user: UserPayload):
         last_song = (await self.last_song())['song_string']
         if last_song == "":
             return "no_song"

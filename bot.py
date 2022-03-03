@@ -7,13 +7,17 @@ from twitchio.ext import commands
 
 import mqtt
 from db import DB
-from utils import SongRequest
+from utils import SongRequest, UserPayload
 
 HELP_MESSAGE = '''
 Request future songs --> ?request artist name - song title |
 Get movie info --> ?watching or ?w |
 Save song to your list --> ?save or ?heart
 '''
+
+
+def get_context(ctx: commands.Context) -> (int, str):
+    return ctx.author.id, ctx.author.name
 
 
 class Bot(commands.Bot):
@@ -81,8 +85,10 @@ class Bot(commands.Bot):
         split = request_args.split('-', 1)
 
         if len(split) >= 2:
+            user_id, username = get_context(ctx)
             request = SongRequest({
-                "user": ctx.author.name,
+                "user": username,
+                "user_id": user_id,
                 "artist": split[0].strip(),
                 "song_title": split[1].strip(),
                 "request_date": int(time()),
@@ -117,7 +123,17 @@ class Bot(commands.Bot):
     @commands.command(name="save", aliases=["fave", "heart", "favorite", "love", "like"])
     async def save_song(self, ctx: commands.Context):
         print(f"> Command 'save' called by: {ctx.author.name}")
-        result = await self.db.save_current_song(ctx.author.name)
+
+        user_id, username = get_context(ctx)
+        print(get_context(ctx))
+        user = UserPayload({
+            "user": username,
+            "user_id": user_id,
+        })
+
+        print(user)
+
+        result = await self.db.save_current_song(user)
         if result == "already_exists":
             await ctx.send(f"{ctx.author.name} You already saved this song! BabyRage")
         elif result == "no_song":
@@ -132,11 +148,33 @@ class Bot(commands.Bot):
 
     @commands.command(name="save-last", aliases=["fave-last", "heart-last", "favorite-last"])
     async def save_last_song(self, ctx: commands.Context):
-        print(f"> Command 'save-last' called by: {ctx.author.name}")
-        result = await self.db.save_last_song(ctx.author.name)
+        user_id, username = get_context(ctx)
+        print(f"> Command 'save-last' called by: {username}")
+        user = UserPayload({
+            "user": username,
+            "user_id": user_id,
+        })
+
+        result = await self.db.save_last_song(user)
         if result == "already_exists":
             await ctx.send(f"{ctx.author.name} You already saved that song! BabyRage")
         elif result == "no_song":
             await ctx.send(f"{ctx.author.name} No last song to add! BabyRage")
         else:
             await ctx.send(f"{ctx.author.name} Added to your saved list! CoolCat")
+
+    @commands.command(name="superfave", aliases=["supersave", "superlove", "superheart"])
+    async def super_fave_song(self, ctx: commands.Context):
+        user_id, username = get_context(ctx)
+        print(f"> Command 'superfave' called by: {username}")
+        user = UserPayload({
+            "user": username,
+            "user_id": user_id,
+        })
+        res = await self.db.super_fave_song(user)
+        if res == "aleady_exists":
+            await ctx.send(f"{ctx.author.display_name} Sorry! You already superfaved this one seasid3IsForCri")
+        elif res == "no_song":
+            await ctx.send(f"{ctx.author.display_name} Sorry, I can't figure out what is playing, please yell at @Duke_Ferdinand seasid3IsForPray")
+        else:
+            await ctx.send(f"{ctx.author.display_name} YES! That's a nice superfave, good taste seasid3IsForNod")
