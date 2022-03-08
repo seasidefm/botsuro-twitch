@@ -6,6 +6,7 @@ from time import time
 from twitchio.ext import commands
 
 import mqtt
+from api.service import SeasideAPI
 from db import DB
 from utils import SongRequest, UserPayload
 
@@ -18,6 +19,15 @@ Save song to your list --> ?save or ?heart
 
 def get_context(ctx: commands.Context) -> (int, str):
     return ctx.author.id, ctx.author.name
+
+
+emoji = {
+    "cri": "seasid3IsForCri",
+    "nod": "seasid3IsForNod",
+    "cool": "seasid3IsForCool",
+    "noted": "seasid3IsForNoted",
+    "howdy": "seasid3IsForHowdy",
+}
 
 
 class Bot(commands.Bot):
@@ -39,6 +49,9 @@ class Bot(commands.Bot):
         super().__init__(token=token, prefix="?", initial_channels=channels)
         self.channels = channels
 
+        # Init Seaside API interaction
+        self.api = SeasideAPI()
+
         # Setup mqtt client for later
         self.client = mqtt.get_mqtt_client()
 
@@ -53,6 +66,56 @@ class Bot(commands.Bot):
         print(f'> Bot ready, logged in as: {self.nick}')
         print(f'> Watching channel(s): {self.channels}')
 
+    # Format responses for current faves
+    # ===================================================
+    def __format_fave_response(self, result: str, username: str):
+        if result == "EXISTS":
+            return f"{username} You already saved this song! {emoji['cri']}"
+        elif result == "ERROR":
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+        else:
+            return f"{username} Added to your saved list! {emoji['noted']}"
+
+            # TODO: Move this to the API!
+            print("Updating heat for current song")
+            song = self.db.current_song()
+            print(f"-> {song['song_string']}")
+            self.send_heat_message(song['song_string'])
+
+    def __format_superfave_response(self, result: str, username: str):
+        if result == "EXISTS":
+            return f"{username} You already superfaved this song! {emoji['cri']}"
+        elif result == "ERROR":
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+        else:
+            return f"{username} That's a nice superfave, good taste {emoji['nod']}"
+
+            # TODO: Move this to the API!
+            print("Updating heat for current song")
+            song = self.db.current_song()
+            print(f"-> {song['song_string']}")
+            self.send_heat_message(song['song_string'])
+
+    # Format responses for last faves
+    # ===================================================
+    @staticmethod
+    def __format_last_fave(result: str, username: str):
+        if result == "EXISTS":
+            return f"{username} You already saved that song! {emoji['cri']}"
+        elif result == "ERROR":
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+        else:
+            return f"{username} Added last song to your saved list! {emoji['cool']}"
+
+    @staticmethod
+    def __format_last_superfave(result: str, username: str):
+        if result == "EXISTS":
+            return f"{username} You already superfaved that song! {emoji['cri']}"
+        elif result == "ERROR":
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+        else:
+            return f"{username} Nice! Added that to your superfave list {emoji['noted']}"
+
     # Helpful
     # ===========================
     @commands.command(name="help", aliases=["h"])
@@ -65,7 +128,7 @@ class Bot(commands.Bot):
     @commands.command(name="hey", aliases=["hello", "hi"])
     async def hey(self, ctx: commands.Context):
         print(f"> Command 'hey' called by: {ctx.author.name}")
-        await ctx.send(f"{ctx.author.name} Hey hey heyyyyyy! I'm ride on time VoHiYo")
+        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy! I'm ride on time {emoji['howdy']}")
 
     # Movie info
     # ===========================
@@ -73,7 +136,7 @@ class Bot(commands.Bot):
     async def watching(self, ctx: commands.Context):
         print(f"> Command 'watching' called by: {ctx.author.name}")
         video = await self.db.get_video_title()
-        await ctx.send(f"{ctx.author.name} This is what we are watching:")
+        await ctx.send(f"{ctx.author.display_name} This is what we are watching:")
         await ctx.send(video)
 
     # Song requests
@@ -82,7 +145,7 @@ class Bot(commands.Bot):
     async def log_request(self, ctx: commands.Context):
         print(f"> Command 'request' called by: {ctx.author.name}")
         request_args = ctx.message.content.replace('?request', '')
-        split = request_args.split('-', 1)
+        split = request_args.split(' - ', 1)
 
         if len(split) >= 2:
             user_id, username = get_context(ctx)
@@ -96,13 +159,13 @@ class Bot(commands.Bot):
 
             await self.db.save_request(request)
             await ctx.send(
-                f"{ctx.author.name} Got it, that's '{request['artist']} - {request['song_title']}' CoolCat"
+                f"{ctx.author.display_name} Got it, that's '{request['artist']} - {request['song_title']}' CoolCat"
             )
         else:
             if ctx.author.name == "discosparkle":
-                await ctx.send(f"{ctx.author.name} Nah b, you playin")
+                await ctx.send(f"{ctx.author.display_name} Nah b, you playin")
             else:
-                await ctx.send(f"Sorry, {ctx.author.name} I didn't get that. See ?help for format! BabyRage")
+                await ctx.send(f"Sorry, {ctx.author.display_name} I didn't get that. See ?help for format! {emoji['cri']}")
 
     # Song ID
     # ===========================
@@ -122,59 +185,34 @@ class Bot(commands.Bot):
     # ===========================
     @commands.command(name="save", aliases=["fave", "heart", "favorite", "love", "like"])
     async def save_song(self, ctx: commands.Context):
-        print(f"> Command 'save' called by: {ctx.author.name}")
-
         user_id, username = get_context(ctx)
-        print(get_context(ctx))
-        user = UserPayload({
-            "user": username,
-            "user_id": user_id,
-        })
-
-        print(user)
-
-        result = await self.db.save_current_song(user)
-        if result == "already_exists":
-            await ctx.send(f"{ctx.author.name} You already saved this song! BabyRage")
-        elif result == "no_song":
-            await ctx.send(f"{ctx.author.name} No song is playing, use ?fave-last BabyRage")
-        else:
-            await ctx.send(f"{ctx.author.name} Added to your saved list! CoolCat")
-
-            print("Updating heat for current song")
-            song = await self.db.current_song()
-            print(f"-> {song['song_string']}")
-            self.send_heat_message(song['song_string'])
+        print(f"> Command 'save' called by: {username}")
+        result = self.api.add_fave(user_id)
+        response = self.__format_fave_response(result, ctx.author.display_name)
+        await ctx.send(response)
 
     @commands.command(name="save-last", aliases=["fave-last", "heart-last", "favorite-last"])
     async def save_last_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
-        print(f"> Command 'save-last' called by: {username}")
-        user = UserPayload({
-            "user": username,
-            "user_id": user_id,
-        })
+        print(f"> Command 'save' called by: {username}")
+        result = self.api.add_fave(user_id, last=True)
+        response = self.__format_last_fave(result, ctx.author.display_name)
+        await ctx.send(response)
 
-        result = await self.db.save_last_song(user)
-        if result == "already_exists":
-            await ctx.send(f"{ctx.author.name} You already saved that song! BabyRage")
-        elif result == "no_song":
-            await ctx.send(f"{ctx.author.name} No last song to add! BabyRage")
-        else:
-            await ctx.send(f"{ctx.author.name} Added to your saved list! CoolCat")
-
+    # Superfave commands
+    # ===========================
     @commands.command(name="superfave", aliases=["supersave", "superlove", "superheart"])
     async def super_fave_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'superfave' called by: {username}")
-        user = UserPayload({
-            "user": username,
-            "user_id": user_id,
-        })
-        res = await self.db.super_fave_song(user)
-        if res == "aleady_exists":
-            await ctx.send(f"{ctx.author.display_name} Sorry! You already superfaved this one seasid3IsForCri")
-        elif res == "no_song":
-            await ctx.send(f"{ctx.author.display_name} Sorry, I can't figure out what is playing, please yell at @Duke_Ferdinand seasid3IsForPray")
-        else:
-            await ctx.send(f"{ctx.author.display_name} YES! That's a nice superfave, good taste seasid3IsForNod")
+        result = self.api.add_superfave(user_id)
+        response = self.__format_superfave_response(result, ctx.author.display_name)
+        await ctx.send(response)
+
+    @commands.command(name="superfave-last", aliases=["supersave-last", "superlove-last", "superheart-last"])
+    async def super_fave_last(self, ctx: commands.Context):
+        user_id, username = get_context(ctx)
+        print(f"> Command 'superfave-last' called by: {username}")
+        result = self.api.add_superfave(user_id, last=True)
+        response = self.__format_last_superfave(result, ctx.author.display_name)
+        await ctx.send(response)

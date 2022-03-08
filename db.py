@@ -1,6 +1,4 @@
-import datetime
 import os
-import string
 import time
 
 from bson.json_util import dumps
@@ -123,7 +121,7 @@ class DB:
             return "no_song"
         return await self.__song_saver(user, last_song)
 
-    async def current_song(self):
+    def current_song(self):
         collection = self.db.get_collection('current_song')
         requests = collection.find({"type": "current_song"})
         return list(requests)[0]
