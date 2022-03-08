@@ -1,5 +1,3 @@
-import asyncio
-import datetime
 import os  # for importing env vars for the bot to use
 from time import time
 
@@ -8,12 +6,14 @@ from twitchio.ext import commands
 import mqtt
 from api.service import SeasideAPI
 from db import DB
-from utils import SongRequest, UserPayload
+from utils import SongRequest
 
 HELP_MESSAGE = '''
+Get song info --> ?song or ?last |
 Request future songs --> ?request artist name - song title |
 Get movie info --> ?watching or ?w |
-Save song to your list --> ?save or ?heart
+Save song to your list --> ?save or ?heart |
+SUPER FAVE a song in your list --> ?superfave or ?superheart
 '''
 
 
@@ -172,14 +172,20 @@ class Bot(commands.Bot):
     @commands.command(name="song", aliases=["s", "playing", "current"])
     async def song(self, ctx: commands.Context):
         print(f"> Command 'song' called by: {ctx.author.name}")
-        song = await self.db.current_song()
-        await ctx.send(f"{ctx.author.name} Current song: {song['song_string']}")
+        song = self.api.now_playing()
+        if song != "ERROR":
+            await ctx.send(f"{ctx.author.display_name} Current song: {song}")
+        else:
+            await ctx.send(f"Something went wrong getting the current song! {emoji['cri']}")
 
     @commands.command(name="last", aliases=["l", "last-song", "prev"])
     async def last_song(self, ctx: commands.Context):
         print(f"> Command 'last' called by: {ctx.author.name}")
-        song = await self.db.last_song()
-        await ctx.send(f"{ctx.author.name} Last song: {song['song_string']}")
+        song = self.api.last_song()
+        if song != "ERROR":
+            await ctx.send(f"{ctx.author.display_name} Last song: {song}")
+        else:
+            await ctx.send(f"Something went wrong getting the last song! {emoji['cri']}")
 
     # Fave commands
     # ===========================

@@ -2,6 +2,16 @@ import os
 import requests
 
 
+class Song:
+    def __init__(self, song: dict):
+        self.artist = song['artist']
+        self.song = song['song']
+        self.timestamp = song['timestamp']
+
+    def to_string(self):
+        return f"{self.artist} - {self.song}"
+
+
 class SeasideAPI:
     def __init__(self):
         token = os.environ.get('SEASIDE_API_KEY')
@@ -40,6 +50,38 @@ class SeasideAPI:
 
     def format_url(self, path: str):
         return f"{self.host}{path}"
+
+    def now_playing(self):
+        print('Getting current song')
+        result = self.__fetch(
+            'GET',
+            '/songs/current',
+            None
+        )
+
+        response = result.json()
+
+        if response['data']:
+            return Song(response['data']).to_string()
+
+        print(result, response)
+        return "ERROR"
+
+    def last_song(self):
+        print('Getting last song')
+        result = self.__fetch(
+            'GET',
+            '/songs/last',
+            None
+        )
+
+        response = result.json()
+
+        if response['data']:
+            return Song(response['data']).to_string()
+
+        print(result, response)
+        return "ERROR"
 
     def add_fave(self, user_id: str, last=False):
         print(f'Adding fave for {user_id}')
