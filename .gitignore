@@ -2,4 +2,4 @@
 venv
 __pycache__
 node_modules/
-/kubernetes/secrets.yml
+/kubernetes/secret.yml

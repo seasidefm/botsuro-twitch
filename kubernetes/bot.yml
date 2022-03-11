@@ -36,5 +36,15 @@ spec:
                 secretKeyRef:
                   name: botsuro-secret
                   key: MONGO_CONNECTION
+            - name: SEASIDE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: SEASIDE_API_KEY
+            - name: SEASIDE_API_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: SEASIDE_API_HOST
       imagePullSecrets:
         - name: regcred

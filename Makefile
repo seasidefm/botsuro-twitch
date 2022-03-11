@@ -7,5 +7,5 @@ build: prepare
 deploy:
 	docker buildx build --platform linux/arm64 --push -t registry.dougflynn.dev/botsuro -f docker/Dockerfile .
 # 	docker buildx build --platform linux/arm64,linux/amd64 --push -t registry.dougflynn.dev/botsuro-api -f docker/Dockerfile.server .
-	sleep 8
-	kubectl rollout restart -n botsuro deployment botsuro-deployment
+	sleep 10
+	kubectl rollout restart -n seasidefm deployment botsuro-twitch
