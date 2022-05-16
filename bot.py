@@ -21,6 +21,11 @@ def get_context(ctx: commands.Context) -> (int, str):
     return ctx.author.id, ctx.author.name
 
 
+def get_discord_message() -> str:
+    link = os.getenv('DISCORD_LINK')
+    return f"Interested in joining our subscriber discord for more SeasideFM content? Link your twitch account to Discord, then join here --> {link}"
+
+
 emoji = {
     "cri": "seasid3IsForCri",
     "nod": "seasid3IsForNod",
@@ -122,6 +127,13 @@ class Bot(commands.Bot):
     async def help(self, ctx: commands.Context):
         print(f"> Command 'help' called by: {ctx.author.name}")
         await ctx.send(HELP_MESSAGE)
+
+    # Social
+    # ===========================
+    @commands.command(name="discord", aliases=["server"])
+    async def help(self, ctx: commands.Context):
+        print(f"> Command 'help' called by: {ctx.author.name}")
+        await ctx.send(get_discord_message())
 
     # Fun
     # ===========================
