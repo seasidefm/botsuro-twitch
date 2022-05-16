@@ -131,7 +131,7 @@ class Bot(commands.Bot):
     # Social
     # ===========================
     @commands.command(name="discord", aliases=["server"])
-    async def help(self, ctx: commands.Context):
+    async def discord(self, ctx: commands.Context):
         print(f"> Command 'help' called by: {ctx.author.name}")
         await ctx.send(get_discord_message())
 
