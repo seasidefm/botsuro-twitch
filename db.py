@@ -8,12 +8,10 @@ from pymongo import MongoClient
 from utils import SongRequest, UserPayload
 
 TEMP_MOVIE_DETAILS = """
-Title: Maison Ikkoku |
-Synopsis: Maison Ikkoku is a bitter-sweet romantic comedy involving a group of
-madcap people who live in a boarding house in 1980s Tokyo. The story focuses
-primarily on the gradually developing relationships between Yusaku Godai, a poor
-student down on his luck, and Kyoko Otonashi, a young, recently widowed boarding
-house manager.
+Scenes from: Yakuza Zessyō (やくざ絶唱) (1970),
+Yakuza Graveyard (やくざの墓場:くちなしの花)(1976),
+Play it, Boogie-Woogie (スローなブギにしてくれ) (1981),
+The Way of a Yakuza Lady (極道の妻たち)(1989)
 """
 
 
