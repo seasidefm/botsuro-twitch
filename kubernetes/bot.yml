@@ -18,7 +18,7 @@ spec:
       containers:
         - name: botsuro-twitch
           # Add your own personal registry here
-          image: registry.dougflynn.dev/botsuro:latest
+          image: redbirddigital/botsuro:latest
           imagePullPolicy: Always
           env:
             - name: BOT_TOKEN
