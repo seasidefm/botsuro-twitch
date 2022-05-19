@@ -46,5 +46,10 @@ spec:
                 secretKeyRef:
                   name: botsuro-secret
                   key: SEASIDE_API_HOST
+            - name: DISCORD_LINK
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: DISCORD_LINK
       imagePullSecrets:
         - name: regcred
