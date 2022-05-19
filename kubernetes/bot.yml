@@ -51,5 +51,10 @@ spec:
                 secretKeyRef:
                   name: botsuro-secret
                   key: DISCORD_LINK
+            - name: MQTT_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: botsuro-secret
+                  key: MQTT_HOST
       imagePullSecrets:
         - name: regcred
