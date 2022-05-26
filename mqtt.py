@@ -11,8 +11,6 @@ topics = {
 def get_mqtt_client():
     if not os.environ.get('MQTT_HOST'):
         print('WARNING: CANNOT FIND MQTT HOST IN ENV')
-        print('Falling back to 10.0.20.3')
-        os.environ['MQTT_HOST'] = '10.0.20.3'
 
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(_, userdata, flags, rc):
@@ -22,7 +20,7 @@ def get_mqtt_client():
         # reconnect then subscriptions will be renewed.
         # client.subscribe(topic)
 
-    client = mqtt.Client()
+    client = mqtt.Client("botsuro", transport="tcp")
     client.on_connect = on_connect
 
     return client
