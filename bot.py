@@ -62,7 +62,7 @@ class Bot(commands.Bot):
 
     def send_heat_message(self, song: bytes):
         c = self.client
-        c.connect(os.environ['MQTT_HOST'], 5555, 60)
+        c.connect(os.environ['MQTT_HOST'], 8883, 60)
         c.publish(topic=mqtt.topics['NEW_HEAT'], payload=song)
         c.disconnect()
 
