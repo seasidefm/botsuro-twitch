@@ -27,11 +27,10 @@ def get_discord_message() -> str:
 
 
 emoji = {
-    "cri": "seasid3IsForCri",
     "nod": "seasid3IsForNod",
+    "pray": "seasid3IsForPray",
     "cool": "seasid3IsForCool",
-    "noted": "seasid3IsForNoted",
-    "howdy": "seasid3IsForHowdy",
+    "wave": "seasid3IsForWave",
 }
 
 
@@ -75,11 +74,11 @@ class Bot(commands.Bot):
     # ===================================================
     def __format_fave_response(self, result: str, username: str):
         if result == "EXISTS":
-            return f"{username} You already saved this song! {emoji['cri']}"
+            return f"{username} You already saved this song! {emoji['pray']}"
         elif result == "ERROR":
-            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['pray']}"
         else:
-            return f"{username} Added to your saved list! {emoji['noted']}"
+            return f"{username} Added to your saved list! {emoji['cool']}"
 
             # TODO: Move this to the API!
             print("Updating heat for current song")
@@ -89,9 +88,9 @@ class Bot(commands.Bot):
 
     def __format_superfave_response(self, result: str, username: str):
         if result == "EXISTS":
-            return f"{username} You already superfaved this song! {emoji['cri']}"
+            return f"{username} You already superfaved this song! {emoji['pray']}"
         elif result == "ERROR":
-            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['pray']}"
         else:
             return f"{username} That's a nice superfave, good taste {emoji['nod']}"
 
@@ -106,20 +105,20 @@ class Bot(commands.Bot):
     @staticmethod
     def __format_last_fave(result: str, username: str):
         if result == "EXISTS":
-            return f"{username} You already saved that song! {emoji['cri']}"
+            return f"{username} You already saved that song! {emoji['pray']}"
         elif result == "ERROR":
-            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['pray']}"
         else:
             return f"{username} Added last song to your saved list! {emoji['cool']}"
 
     @staticmethod
     def __format_last_superfave(result: str, username: str):
         if result == "EXISTS":
-            return f"{username} You already superfaved that song! {emoji['cri']}"
+            return f"{username} You already superfaved that song! {emoji['pray']}"
         elif result == "ERROR":
-            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['cri']}"
+            return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['pray']}"
         else:
-            return f"{username} Nice! Added that to your superfave list {emoji['noted']}"
+            return f"{username} Nice! Added that to your superfave list {emoji['nod']}"
 
     # Helpful
     # ===========================
@@ -140,7 +139,7 @@ class Bot(commands.Bot):
     @commands.command(name="hey", aliases=["hello", "hi"])
     async def hey(self, ctx: commands.Context):
         print(f"> Command 'hey' called by: {ctx.author.name}")
-        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy! I'm ride on time {emoji['howdy']}")
+        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy! I'm ride on time {emoji['wave']}")
 
     # Movie info
     # ===========================
@@ -177,7 +176,7 @@ class Bot(commands.Bot):
             if ctx.author.name == "discosparkle":
                 await ctx.send(f"{ctx.author.display_name} Nah b, you playin")
             else:
-                await ctx.send(f"Sorry, {ctx.author.display_name} I didn't get that. See ?help for format! {emoji['cri']}")
+                await ctx.send(f"Sorry, {ctx.author.display_name} I didn't get that. See ?help for format! {emoji['pray']}")
 
     # Song ID
     # ===========================
@@ -188,7 +187,7 @@ class Bot(commands.Bot):
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Current song: {song}")
         else:
-            await ctx.send(f"Something went wrong getting the current song! {emoji['cri']}")
+            await ctx.send(f"Something went wrong getting the current song! {emoji['pray']}")
 
     @commands.command(name="last", aliases=["l", "last-song", "prev"])
     async def last_song(self, ctx: commands.Context):
@@ -197,7 +196,7 @@ class Bot(commands.Bot):
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Last song: {song}")
         else:
-            await ctx.send(f"Something went wrong getting the last song! {emoji['cri']}")
+            await ctx.send(f"Something went wrong getting the last song! {emoji['pray']}")
 
     # Fave commands
     # ===========================
