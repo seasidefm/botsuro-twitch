@@ -23,7 +23,7 @@ def get_context(ctx: commands.Context) -> (int, str):
 
 def get_discord_message() -> str:
     link = os.getenv('DISCORD_LINK')
-    return f"Interested in joining our subscriber discord for more SeasideFM content? Link your twitch account to Discord, then join here --> {link}"
+    return f"Want to join our discord and get to know the community? Link your twitch account to Discord, then join here --> {link}"
 
 
 emoji = {
