@@ -1,3 +1,7 @@
+SHELL = /bin/bash
+run:
+	. .env
+	./venv/bin/python main.py
 prepare:
 	docker run --rm --privileged linuxkit/binfmt:v0.8
 
