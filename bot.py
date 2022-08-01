@@ -80,12 +80,6 @@ class Bot(commands.Bot):
         else:
             return f"{username} Added to your saved list! {emoji['cool']}"
 
-            # TODO: Move this to the API!
-            print("Updating heat for current song")
-            song = self.db.current_song()
-            print(f"-> {song['song_string']}")
-            self.send_heat_message(song['song_string'])
-
     def __format_superfave_response(self, result: str, username: str):
         if result == "EXISTS":
             return f"{username} You already superfaved this song! {emoji['pray']}"
@@ -93,12 +87,6 @@ class Bot(commands.Bot):
             return f"{username} Something went wrong! Please tell @Duke_Ferdinand {emoji['pray']}"
         else:
             return f"{username} That's a nice superfave, good taste {emoji['nod']}"
-
-            # TODO: Move this to the API!
-            print("Updating heat for current song")
-            song = self.db.current_song()
-            print(f"-> {song['song_string']}")
-            self.send_heat_message(song['song_string'])
 
     # Format responses for last faves
     # ===================================================
