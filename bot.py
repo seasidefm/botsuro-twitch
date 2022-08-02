@@ -254,9 +254,11 @@ class Bot(commands.Bot):
         _, username = get_context(ctx)
         print(f"> Command '{command}' called by: {username}")
 
+        lang = "pt-BR" if command == "pt" else command
+
         try:
             result = self.api.get_translation(
-                command,
+                lang,
                 self.strip_command(f"?{command}", ctx.message.content).strip()
             )
             if result is None:
