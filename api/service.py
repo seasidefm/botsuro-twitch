@@ -110,7 +110,7 @@ class SeasideAPI:
 
         return self.__parse_fave_response(result)
 
-    def get_english_translation(self, text: str) -> str:
+    def get_translation(self, lang: str, text: str) -> str:
         print("Getting translation for >")
         print("----------------------------------------------------------")
         print(f"> {text}")
@@ -118,9 +118,10 @@ class SeasideAPI:
 
         result = self.__fetch(
             'POST',
-            '/translate/to-english',
+            '/translate',
             {
-                "text": text
+                "text": text,
+                "target": lang
             }
         )
 

@@ -241,19 +241,45 @@ class Bot(commands.Bot):
 
     # Translation commands
     # ===========================
-    @commands.command(name="en")
-    async def get_english_translation(self, ctx: commands.Context):
+    async def handle_translation(self, command: str, ctx: commands.Context):
         _, username = get_context(ctx)
-        print(f"> Command 'en' called by: {username}")
+        print(f"> Command '{command}' called by: {username}")
 
         try:
-            result = self.api.get_english_translation(
-                self.strip_command("?en", ctx.message.content).strip()
+            result = self.api.get_translation(
+                command,
+                self.strip_command(f"?{command}", ctx.message.content).strip()
             )
             if result is None:
-                await ctx.send(self.generic_error("?en"))
+                await ctx.send(self.generic_error("?{command}"))
             else:
                 await ctx.reply(f'{emoji["talking"]} Translation: {result}')
 
         except:
-            await ctx.send(self.generic_error("?en", "This may be caused by an emote or username tricking me into thinking this is English."))
+            await ctx.send(self.generic_error("?{command}", "This may be caused by an emote or username tricking me..."))
+
+    @commands.command(name="en")
+    async def get_en(self, ctx: commands.Context):
+        await self.handle_translation('en', ctx)
+
+    @commands.command(name="ja")
+    async def get_ja(self, ctx: commands.Context):
+        await self.handle_translation('ja', ctx)
+
+    @commands.command(name="fr")
+    async def get_fr(self, ctx: commands.Context):
+        await self.handle_translation('fr', ctx)
+
+    @commands.command(name="de")
+    async def get_de(self, ctx: commands.Context):
+        await self.handle_translation('de', ctx)
+
+    @commands.command(name="pt")
+    async def get_pt(self, ctx: commands.Context):
+        await self.handle_translation('pt', ctx)
+
+    @commands.command(name="es")
+    async def get_es(self, ctx: commands.Context):
+        await self.handle_translation('es', ctx)
+
+    # ===========================
