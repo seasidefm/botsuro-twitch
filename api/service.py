@@ -1,4 +1,5 @@
 import os
+from unittest import result
 import requests
 
 
@@ -108,5 +109,23 @@ class SeasideAPI:
         )
 
         return self.__parse_fave_response(result)
+
+    def get_english_translation(self, text: str) -> str:
+        print("Getting translation for >")
+        print("----------------------------------------------------------")
+        print(f"> {text}")
+        print("----------------------------------------------------------")
+
+        result = self.__fetch(
+            'POST',
+            '/translate/to-english',
+            {
+                "text": text
+            }
+        )
+
+        parsed = result.json()
+
+        return parsed['data'] or None
 
 

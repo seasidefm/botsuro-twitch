@@ -1,5 +1,7 @@
+from ctypes import Union
 import os  # for importing env vars for the bot to use
 from time import time
+from unittest import result
 
 from twitchio.ext import commands
 
@@ -29,8 +31,11 @@ def get_discord_message() -> str:
 emoji = {
     "nod": "seasid3IsForNod",
     "pray": "seasid3IsForPray",
+    "love": "seasid3IsForLove",
+    "robot": "MrDestructoid",
     "cool": "seasid3IsForCool",
     "wave": "seasid3IsForWave",
+    "talking": "🗣️",
 }
 
 
@@ -69,6 +74,14 @@ class Bot(commands.Bot):
         # We are logged in and ready to chat and use commands...
         print(f'> Bot ready, logged in as: {self.nick}')
         print(f'> Watching channel(s): {self.channels}')
+
+    @staticmethod
+    def strip_command(command: str, text: str) -> str:
+        return text.replace(command, '')
+
+    @staticmethod
+    def generic_error(command: str, context=None) -> str:
+        return f"@Duke_Ferdinand BLEEP BLOOP {emoji['robot']} Something went wrong with {command} command! {context if not None else ''}"
 
     # Format responses for current faves
     # ===================================================
@@ -204,6 +217,8 @@ class Bot(commands.Bot):
         response = self.__format_last_fave(result, ctx.author.display_name)
         await ctx.send(response)
 
+    # ===========================
+
     # Superfave commands
     # ===========================
     @commands.command(name="superfave", aliases=["supersave", "superlove", "superheart"])
@@ -221,3 +236,24 @@ class Bot(commands.Bot):
         result = self.api.add_superfave(user_id, last=True)
         response = self.__format_last_superfave(result, ctx.author.display_name)
         await ctx.send(response)
+
+    # ===========================
+
+    # Translation commands
+    # ===========================
+    @commands.command(name="en")
+    async def get_english_translation(self, ctx: commands.Context):
+        _, username = get_context(ctx)
+        print(f"> Command 'en' called by: {username}")
+
+        try:
+            result = self.api.get_english_translation(
+                self.strip_command("?en", ctx.message.content).strip()
+            )
+            if result is None:
+                await ctx.send(self.generic_error("?en"))
+            else:
+                await ctx.reply(f'{emoji["talking"]} Translation: {result}')
+
+        except:
+            await ctx.send(self.generic_error("?en", "This may be caused by an emote or username tricking me into thinking this is English."))
