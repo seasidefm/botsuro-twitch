@@ -15,7 +15,16 @@ Get song info --> ?song or ?last |
 Request future songs --> ?request artist name - song title |
 Get movie info --> ?watching or ?w |
 Save song to your list --> ?save or ?heart |
-SUPER FAVE a song in your list --> ?superfave or ?superheart
+SUPER FAVE a song in your list --> ?superfave or ?superheart |
+Get help with translations --> ?translate
+'''
+
+TRANSLATION_HELP = '''
+?en --> Translate to English |
+?ja --> Translate to Japanese |
+?pt --> Translate to Portuguese |
+?fr --> Translate to French |
+?de --> Translate to German
 '''
 
 
@@ -257,6 +266,10 @@ class Bot(commands.Bot):
 
         except:
             await ctx.send(self.generic_error("?{command}", "This may be caused by an emote or username tricking me..."))
+
+    @commands.command(name="translate")
+    async def translate_help(self, ctx: commands.Context):
+        await ctx.send(TRANSLATION_HELP)
 
     @commands.command(name="en")
     async def get_en(self, ctx: commands.Context):
