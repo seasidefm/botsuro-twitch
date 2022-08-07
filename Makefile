@@ -1,16 +1,20 @@
 SHELL = /bin/bash
 run:
-	. .env
-	./venv/bin/python main.py
-prepare:
-	docker run --rm --privileged linuxkit/binfmt:v0.8
+	source .env \
+	&& ./venv/bin/python main.py
 
-build: prepare
-	docker buildx build --platform linux/arm64 --load -t registry.dougflynn.dev/botsuro -f docker/Dockerfile .
+install:
+	source .env \
+	&& ./venv/bin/pip install -r requirements.txt
 
-deploy:
-	docker build -t redbirddigital/botsuro -f docker/Dockerfile .
-	docker push redbirddigital/botsuro
-# 	docker buildx build --platform linux/arm64,linux/amd64 --push -t registry.dougflynn.dev/botsuro-api -f docker/Dockerfile.server .
-	sleep 10
-	kubectl rollout restart -n seasidefm deployment botsuro-twitch
+install-dev:
+	source .env \
+	&& ./venv/bin/pip install -r requirements-dev.txt
+
+fmt:
+	source .env \
+	&& ./venv/bin/black .
+
+lint:
+	source .env \
+	&& ./venv/bin/flake8 .
