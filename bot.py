@@ -144,12 +144,12 @@ class Bot(commands.Bot):
         print(f"> Command 'help' called by: {ctx.author.name}")
         await ctx.send(get_discord_message())
 
-    # Fun
+    # Greetings
     # ===========================
-    @commands.command(name="hey", aliases=["hello", "hi"])
+    @commands.command(name="hey", aliases=["hello", "hi", "sup", "yo"])
     async def hey(self, ctx: commands.Context):
         print(f"> Command 'hey' called by: {ctx.author.name}")
-        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy! I'm ride on time {emoji['wave']}")
+        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}")
 
     # Movie info
     # ===========================
