@@ -19,10 +19,7 @@ def root(request):
 
 @app.get("/status")
 def status(request):
-    return json({
-        "status": "OK",
-        "more-stats": ["something here"]
-    })
+    return json({"status": "OK", "more-stats": ["something here"]})
 
 
 @app.get("/requests")
@@ -33,5 +30,5 @@ async def requests(request):
 
 if __name__ == "__main__":
     print("[Server] Starting bot companion server")
-    is_dev = os.environ.get('SERVER_ENV') == "development"
+    is_dev = os.environ.get("SERVER_ENV") == "development"
     app.run(host="0.0.0.0", debug=is_dev, auto_reload=is_dev)

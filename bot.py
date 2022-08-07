@@ -10,22 +10,22 @@ from api.service import SeasideAPI
 from db import DB
 from utils import SongRequest
 
-HELP_MESSAGE = '''
+HELP_MESSAGE = """
 Get song info --> ?song or ?last |
 Request future songs --> ?request artist name - song title |
 Get movie info --> ?watching or ?w |
 Save song to your list --> ?save or ?heart |
 SUPER FAVE a song in your list --> ?superfave or ?superheart |
 Get help with translations --> ?translate
-'''
+"""
 
-TRANSLATION_HELP = '''
+TRANSLATION_HELP = """
 ?en --> Translate to English |
 ?ja --> Translate to Japanese |
 ?pt --> Translate to Portuguese |
 ?fr --> Translate to French |
 ?de --> Translate to German
-'''
+"""
 
 
 def get_context(ctx: commands.Context) -> (int, str):
@@ -33,7 +33,7 @@ def get_context(ctx: commands.Context) -> (int, str):
 
 
 def get_discord_message() -> str:
-    link = os.getenv('DISCORD_LINK')
+    link = os.getenv("DISCORD_LINK")
     return f"Want to join our discord and get to know the community? Link your twitch account to Discord, then join here --> {link}"
 
 
@@ -59,8 +59,8 @@ class Bot(commands.Bot):
         if not token or not channels:
             raise EnvironmentError("Cannot find one of BOT_TOKEN or CHANNEL in env")
 
-        if ',' in channels:
-            channels = channels.split(',')
+        if "," in channels:
+            channels = channels.split(",")
         else:
             channels = [channels]
 
@@ -75,18 +75,18 @@ class Bot(commands.Bot):
 
     def send_heat_message(self, song: bytes):
         c = self.client
-        c.connect(os.environ['MQTT_HOST'], 8883, 60)
-        c.publish(topic=mqtt.topics['NEW_HEAT'], payload=song)
+        c.connect(os.environ["MQTT_HOST"], 8883, 60)
+        c.publish(topic=mqtt.topics["NEW_HEAT"], payload=song)
         c.disconnect()
 
     async def event_ready(self):
         # We are logged in and ready to chat and use commands...
-        print(f'> Bot ready, logged in as: {self.nick}')
-        print(f'> Watching channel(s): {self.channels}')
+        print(f"> Bot ready, logged in as: {self.nick}")
+        print(f"> Watching channel(s): {self.channels}")
 
     @staticmethod
     def strip_command(command: str, text: str) -> str:
-        return text.replace(command, '')
+        return text.replace(command, "")
 
     @staticmethod
     def generic_error(command: str, context=None) -> str:
@@ -149,7 +149,9 @@ class Bot(commands.Bot):
     @commands.command(name="hey", aliases=["hello", "hi", "sup", "yo"])
     async def hey(self, ctx: commands.Context):
         print(f"> Command 'hey' called by: {ctx.author.name}")
-        await ctx.send(f"{ctx.author.display_name} Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}")
+        await ctx.send(
+            f"{ctx.author.display_name} Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}"
+        )
 
     # Movie info
     # ===========================
@@ -165,18 +167,20 @@ class Bot(commands.Bot):
     @commands.command(name="request")
     async def log_request(self, ctx: commands.Context):
         print(f"> Command 'request' called by: {ctx.author.name}")
-        request_args = ctx.message.content.replace('?request', '')
-        split = request_args.split(' - ', 1)
+        request_args = ctx.message.content.replace("?request", "")
+        split = request_args.split(" - ", 1)
 
         if len(split) >= 2:
             user_id, username = get_context(ctx)
-            request = SongRequest({
-                "user": username,
-                "user_id": user_id,
-                "artist": split[0].strip(),
-                "song_title": split[1].strip(),
-                "request_date": int(time()),
-            })
+            request = SongRequest(
+                {
+                    "user": username,
+                    "user_id": user_id,
+                    "artist": split[0].strip(),
+                    "song_title": split[1].strip(),
+                    "request_date": int(time()),
+                }
+            )
 
             await self.db.save_request(request)
             await ctx.send(
@@ -186,7 +190,9 @@ class Bot(commands.Bot):
             if ctx.author.name == "discosparkle":
                 await ctx.send(f"{ctx.author.display_name} Nah b, you playin")
             else:
-                await ctx.send(f"Sorry, {ctx.author.display_name} I didn't get that. See ?help for format! {emoji['pray']}")
+                await ctx.send(
+                    f"Sorry, {ctx.author.display_name} I didn't get that. See ?help for format! {emoji['pray']}"
+                )
 
     # Song ID
     # ===========================
@@ -197,7 +203,9 @@ class Bot(commands.Bot):
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Current song: {song}")
         else:
-            await ctx.send(f"Something went wrong getting the current song! {emoji['pray']}")
+            await ctx.send(
+                f"Something went wrong getting the current song! {emoji['pray']}"
+            )
 
     @commands.command(name="last", aliases=["l", "last-song", "prev"])
     async def last_song(self, ctx: commands.Context):
@@ -206,11 +214,15 @@ class Bot(commands.Bot):
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Last song: {song}")
         else:
-            await ctx.send(f"Something went wrong getting the last song! {emoji['pray']}")
+            await ctx.send(
+                f"Something went wrong getting the last song! {emoji['pray']}"
+            )
 
     # Fave commands
     # ===========================
-    @commands.command(name="save", aliases=["fave", "heart", "favorite", "love", "like"])
+    @commands.command(
+        name="save", aliases=["fave", "heart", "favorite", "love", "like"]
+    )
     async def save_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'save' called by: {username}")
@@ -218,7 +230,9 @@ class Bot(commands.Bot):
         response = self.__format_fave_response(result, ctx.author.display_name)
         await ctx.send(response)
 
-    @commands.command(name="save-last", aliases=["fave-last", "heart-last", "favorite-last"])
+    @commands.command(
+        name="save-last", aliases=["fave-last", "heart-last", "favorite-last"]
+    )
     async def save_last_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'save' called by: {username}")
@@ -230,7 +244,9 @@ class Bot(commands.Bot):
 
     # Superfave commands
     # ===========================
-    @commands.command(name="superfave", aliases=["supersave", "superlove", "superheart"])
+    @commands.command(
+        name="superfave", aliases=["supersave", "superlove", "superheart"]
+    )
     async def super_fave_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'superfave' called by: {username}")
@@ -238,7 +254,10 @@ class Bot(commands.Bot):
         response = self.__format_superfave_response(result, ctx.author.display_name)
         await ctx.send(response)
 
-    @commands.command(name="superfave-last", aliases=["supersave-last", "superlove-last", "superheart-last"])
+    @commands.command(
+        name="superfave-last",
+        aliases=["supersave-last", "superlove-last", "superheart-last"],
+    )
     async def super_fave_last(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'superfave-last' called by: {username}")
@@ -258,8 +277,7 @@ class Bot(commands.Bot):
 
         try:
             result = self.api.get_translation(
-                lang,
-                self.strip_command(f"?{command}", ctx.message.content).strip()
+                lang, self.strip_command(f"?{command}", ctx.message.content).strip()
             )
             if result is None:
                 await ctx.send(self.generic_error("?{command}"))
@@ -267,7 +285,12 @@ class Bot(commands.Bot):
                 await ctx.reply(f'{emoji["talking"]} Translation: {result}')
 
         except:
-            await ctx.send(self.generic_error("?{command}", "This may be caused by an emote or username tricking me..."))
+            await ctx.send(
+                self.generic_error(
+                    "?{command}",
+                    "This may be caused by an emote or username tricking me...",
+                )
+            )
 
     @commands.command(name="translate")
     async def translate_help(self, ctx: commands.Context):
@@ -275,26 +298,26 @@ class Bot(commands.Bot):
 
     @commands.command(name="en")
     async def get_en(self, ctx: commands.Context):
-        await self.handle_translation('en', ctx)
+        await self.handle_translation("en", ctx)
 
     @commands.command(name="ja")
     async def get_ja(self, ctx: commands.Context):
-        await self.handle_translation('ja', ctx)
+        await self.handle_translation("ja", ctx)
 
     @commands.command(name="fr")
     async def get_fr(self, ctx: commands.Context):
-        await self.handle_translation('fr', ctx)
+        await self.handle_translation("fr", ctx)
 
     @commands.command(name="de")
     async def get_de(self, ctx: commands.Context):
-        await self.handle_translation('de', ctx)
+        await self.handle_translation("de", ctx)
 
     @commands.command(name="pt")
     async def get_pt(self, ctx: commands.Context):
-        await self.handle_translation('pt', ctx)
+        await self.handle_translation("pt", ctx)
 
     @commands.command(name="es")
     async def get_es(self, ctx: commands.Context):
-        await self.handle_translation('es', ctx)
+        await self.handle_translation("es", ctx)
 
     # ===========================

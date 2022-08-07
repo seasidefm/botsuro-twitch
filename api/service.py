@@ -5,9 +5,9 @@ import requests
 
 class Song:
     def __init__(self, song: dict):
-        self.artist = song['artist']
-        self.song = song['song']
-        self.timestamp = song['timestamp']
+        self.artist = song["artist"]
+        self.song = song["song"]
+        self.timestamp = song["timestamp"]
 
     def to_string(self):
         return f"{self.artist} - {self.song}"
@@ -15,11 +15,13 @@ class Song:
 
 class SeasideAPI:
     def __init__(self):
-        token = os.environ.get('SEASIDE_API_KEY')
-        host = os.environ.get('SEASIDE_API_HOST', default="https://api.seaside.fm")
+        token = os.environ.get("SEASIDE_API_KEY")
+        host = os.environ.get("SEASIDE_API_HOST", default="https://api.seaside.fm")
 
         if not token:
-            raise EnvironmentError("Cannot find SEASIDE_API_KEY! All services should use an API key.")
+            raise EnvironmentError(
+                "Cannot find SEASIDE_API_KEY! All services should use an API key."
+            )
 
         self.token = token
         self.host = host
@@ -29,8 +31,8 @@ class SeasideAPI:
             self.format_url(path),
             json=data,
             headers={
-                'Authorization': self.token,
-            }
+                "Authorization": self.token,
+            },
         )
 
     @staticmethod
@@ -53,59 +55,45 @@ class SeasideAPI:
         return f"{self.host}{path}"
 
     def now_playing(self):
-        print('Getting current song')
-        result = self.__fetch(
-            'GET',
-            '/songs/current',
-            None
-        )
+        print("Getting current song")
+        result = self.__fetch("GET", "/songs/current", None)
 
         response = result.json()
 
-        if response['data']:
-            return Song(response['data']).to_string()
+        if response["data"]:
+            return Song(response["data"]).to_string()
 
         print(result, response)
         return "ERROR"
 
     def last_song(self):
-        print('Getting last song')
-        result = self.__fetch(
-            'GET',
-            '/songs/last',
-            None
-        )
+        print("Getting last song")
+        result = self.__fetch("GET", "/songs/last", None)
 
         response = result.json()
 
-        if response['data']:
-            return Song(response['data']).to_string()
+        if response["data"]:
+            return Song(response["data"]).to_string()
 
         print(result, response)
         return "ERROR"
 
     def add_fave(self, user_id: str, last=False):
-        print(f'Adding fave for {user_id}')
+        print(f"Adding fave for {user_id}")
         result = self.__fetch(
-            'POST',
-            '/faves',
-            {
-                "user_id": user_id,
-                "song": "last" if last else "current"
-            }
+            "POST",
+            "/faves",
+            {"user_id": user_id, "song": "last" if last else "current"},
         )
 
         return self.__parse_fave_response(result)
 
     def add_superfave(self, user_id: str, last=False):
-        print(f'Adding superfave for {user_id}')
+        print(f"Adding superfave for {user_id}")
         result = self.__fetch(
-            'POST',
-            '/faves/superfave',
-            {
-                "user_id": user_id,
-                "song": "last" if last else "current"
-            }
+            "POST",
+            "/faves/superfave",
+            {"user_id": user_id, "song": "last" if last else "current"},
         )
 
         return self.__parse_fave_response(result)
@@ -116,17 +104,8 @@ class SeasideAPI:
         print(f"> {text}")
         print("----------------------------------------------------------")
 
-        result = self.__fetch(
-            'POST',
-            '/translate',
-            {
-                "text": text,
-                "target": lang
-            }
-        )
+        result = self.__fetch("POST", "/translate", {"text": text, "target": lang})
 
         parsed = result.json()
 
-        return parsed['data'] or None
-
-
+        return parsed["data"] or None

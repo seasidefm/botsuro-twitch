@@ -9,8 +9,8 @@ topics = {
 
 
 def get_mqtt_client():
-    if not os.environ.get('MQTT_HOST'):
-        print('WARNING: CANNOT FIND MQTT HOST IN ENV')
+    if not os.environ.get("MQTT_HOST"):
+        print("WARNING: CANNOT FIND MQTT HOST IN ENV")
 
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(_, userdata, flags, rc):
