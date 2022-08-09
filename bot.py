@@ -150,7 +150,7 @@ class Bot(commands.Bot):
     async def hey(self, ctx: commands.Context):
         print(f"> Command 'hey' called by: {ctx.author.name}")
         await ctx.send(
-            f"{ctx.author.display_name} Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}"
+            f"Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}"
         )
 
     # Movie info
@@ -294,30 +294,77 @@ class Bot(commands.Bot):
 
     @commands.command(name="translate")
     async def translate_help(self, ctx: commands.Context):
+        """
+        Get translation help message
+        """
         await ctx.send(TRANSLATION_HELP)
 
     @commands.command(name="en")
     async def get_en(self, ctx: commands.Context):
+        """
+        Get English translation
+        """
         await self.handle_translation("en", ctx)
 
     @commands.command(name="ja")
     async def get_ja(self, ctx: commands.Context):
+        """
+        Get Japanese translation
+        """
         await self.handle_translation("ja", ctx)
 
     @commands.command(name="fr")
     async def get_fr(self, ctx: commands.Context):
+        """
+        Get French translation
+        """
         await self.handle_translation("fr", ctx)
 
     @commands.command(name="de")
     async def get_de(self, ctx: commands.Context):
+        """
+        Get German translation
+        """
         await self.handle_translation("de", ctx)
 
     @commands.command(name="pt")
     async def get_pt(self, ctx: commands.Context):
+        """
+        Get Portuguese translation
+        """
         await self.handle_translation("pt", ctx)
 
     @commands.command(name="es")
     async def get_es(self, ctx: commands.Context):
+        """
+        Get Spanish translation
+        """
         await self.handle_translation("es", ctx)
+    
+    # Moderator commands
+    # ===========================
+    @commands.command(name="radio")
+    async def set_feature_flag(self, ctx: commands.Context):
+        """
+        Enable or disable radio mode
+        """
+        command = "radio"
+        username = ctx.author.display_name
+        print(f"> Command 'mod-flag' called by: {username}")
+        if ctx.author.is_mod:
+            content = self.strip_command(f"?{command}", ctx.message.content).strip()
+            if content == "on":
+                self.api.set_radio_mode(True)
+                await ctx.send("Radio mode: ON")
+            elif content == "off":
+                self.api.set_radio_mode(False)
+                await ctx.send("Radio mode: OFF")
+            else:
+                await ctx.send(f"Sorry, I don't understand what you're saying! {emoji['robot']}")
+        else:
+            await ctx.reply(f"You do not have permission to use this command {emoji['pray']}")
+        
+
+        # await ctx.send(self.api.set_feature_flag(user_id))
 
     # ===========================
