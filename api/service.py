@@ -110,19 +110,22 @@ class SeasideAPI:
 
         return parsed["data"] or None
 
-    def get_features(self):
-        """ Get the currently enabled features """
+    def get_radio_mode(self):
+        """Check if radio mode is enabled"""
         print("Getting features >")
         result = self.__fetch("GET", "/features", None)
+        feature_dict = result.json()
 
-        return result.json()
+        print(f"Radio mode: {feature_dict['radio_mode']}")
+
+        return bool(feature_dict["radio_mode"])
 
     def set_radio_mode(self, mode: bool):
-        """ Set the radio mode for the stream """
+        """Set the radio mode for the stream"""
         print("Setting radio mode >")
-        features = ["fave_songs", "request_song"]
+        # features = ["fave_songs", "request_song"]
+        features = ["radio_mode"]
         for feature in features:
-            self.__fetch("POST", f"/features/{feature}", {"feature": feature, "value": mode})
+            self.__fetch("POST", f"/feature", {"feature": feature, "value": mode})
 
         return "Enabled" if mode else "Disabled"
-

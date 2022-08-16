@@ -47,6 +47,8 @@ emoji = {
     "talking": "🗣️",
 }
 
+FAVE_NOT_RADIO = f"Thank you for the song interest! We're not in radio mode right now so please see the channel point redemptions for track id {emoji['pray']}"
+
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -130,6 +132,15 @@ class Bot(commands.Bot):
         else:
             return f"{username} Nice! Added that to your superfave list {emoji['nod']}"
 
+    async def check_radio_mode(self, ctx: commands.Context):
+        if self.api.get_radio_mode():
+            return True
+
+        await ctx.reply(
+            f"Sorry, this command is not yet ready for DJ mode {emoji['pray']}"
+        )
+        return False
+
     # Helpful
     # ===========================
     @commands.command(name="help", aliases=["h"])
@@ -167,6 +178,11 @@ class Bot(commands.Bot):
     @commands.command(name="request")
     async def log_request(self, ctx: commands.Context):
         print(f"> Command 'request' called by: {ctx.author.name}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         request_args = ctx.message.content.replace("?request", "")
         split = request_args.split(" - ", 1)
 
@@ -199,6 +215,11 @@ class Bot(commands.Bot):
     @commands.command(name="song", aliases=["s", "playing", "current"])
     async def song(self, ctx: commands.Context):
         print(f"> Command 'song' called by: {ctx.author.name}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         song = self.api.now_playing()
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Current song: {song}")
@@ -210,6 +231,11 @@ class Bot(commands.Bot):
     @commands.command(name="last", aliases=["l", "last-song", "prev"])
     async def last_song(self, ctx: commands.Context):
         print(f"> Command 'last' called by: {ctx.author.name}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         song = self.api.last_song()
         if song != "ERROR":
             await ctx.send(f"{ctx.author.display_name} Last song: {song}")
@@ -226,6 +252,11 @@ class Bot(commands.Bot):
     async def save_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'save' called by: {username}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         result = self.api.add_fave(user_id)
         response = self.__format_fave_response(result, ctx.author.display_name)
         await ctx.send(response)
@@ -236,6 +267,11 @@ class Bot(commands.Bot):
     async def save_last_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'save' called by: {username}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         result = self.api.add_fave(user_id, last=True)
         response = self.__format_last_fave(result, ctx.author.display_name)
         await ctx.send(response)
@@ -250,6 +286,11 @@ class Bot(commands.Bot):
     async def super_fave_song(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'superfave' called by: {username}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         result = self.api.add_superfave(user_id)
         response = self.__format_superfave_response(result, ctx.author.display_name)
         await ctx.send(response)
@@ -261,6 +302,11 @@ class Bot(commands.Bot):
     async def super_fave_last(self, ctx: commands.Context):
         user_id, username = get_context(ctx)
         print(f"> Command 'superfave-last' called by: {username}")
+
+        is_radio_mode = await self.check_radio_mode(ctx)
+        if not is_radio_mode:
+            return
+
         result = self.api.add_superfave(user_id, last=True)
         response = self.__format_last_superfave(result, ctx.author.display_name)
         await ctx.send(response)
@@ -340,7 +386,7 @@ class Bot(commands.Bot):
         Get Spanish translation
         """
         await self.handle_translation("es", ctx)
-    
+
     # Moderator commands
     # ===========================
     @commands.command(name="radio")
@@ -360,10 +406,13 @@ class Bot(commands.Bot):
                 self.api.set_radio_mode(False)
                 await ctx.send("Radio mode: OFF")
             else:
-                await ctx.send(f"Sorry, I don't understand what you're saying! {emoji['robot']}")
+                await ctx.send(
+                    f"Sorry, I don't understand what you're saying! {emoji['robot']}"
+                )
         else:
-            await ctx.reply(f"You do not have permission to use this command {emoji['pray']}")
-        
+            await ctx.reply(
+                f"You do not have permission to use this command {emoji['pray']}"
+            )
 
         # await ctx.send(self.api.set_feature_flag(user_id))
 
