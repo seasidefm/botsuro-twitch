@@ -1,3 +1,4 @@
+import random
 from ctypes import Union
 import os  # for importing env vars for the bot to use
 from time import time
@@ -44,6 +45,7 @@ emoji = {
     "robot": "MrDestructoid",
     "cool": "seasid3IsForCool",
     "wave": "seasid3IsForWave",
+    "booty": "seasid3IsForBootyDance",
     "talking": "🗣️",
 }
 
@@ -154,6 +156,18 @@ class Bot(commands.Bot):
     async def discord(self, ctx: commands.Context):
         print(f"> Command 'help' called by: {ctx.author.name}")
         await ctx.send(get_discord_message())
+
+    @commands.command(name="booty")
+    async def booty(self, ctx):
+        """ Shake the booty emotes """
+        print(f"> Command 'booty' called by: {ctx.author.name}")
+        booty_count = random.randint(1, 25)
+
+        msg = ""
+        for _ in range(1, booty_count):
+            msg += emoji.get("booty") + " "
+
+        await ctx.send(msg)
 
     # Greetings
     # ===========================
