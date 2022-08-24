@@ -157,12 +157,19 @@ class Bot(commands.Bot):
 
     # Greetings
     # ===========================
-    @commands.command(name="hey", aliases=["hello", "hi", "sup", "yo"])
+    @commands.command(name="hey")
     async def hey(self, ctx: commands.Context):
+        """Greet a user in the chat with a wave"""
         print(f"> Command 'hey' called by: {ctx.author.name}")
-        await ctx.send(
-            f"Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}"
-        )
+        split = ctx.message.content.split("?hey")
+
+        message = f"Hey hey heyyyyyy @{ctx.author.display_name}! You're ride on time - welcome in! {emoji['wave']}"
+        if len(split) >= 2 and len(split[1]) > 0:
+            args = split[1:]
+            args = " ".join(args)
+            message = f"Hey hey heyyyyyy {args}! You're ride on time - welcome in! {emoji['wave']}"
+
+        await ctx.send(message)
 
     # Movie info
     # ===========================
