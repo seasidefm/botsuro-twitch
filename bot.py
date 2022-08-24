@@ -161,7 +161,7 @@ class Bot(commands.Bot):
     async def booty(self, ctx):
         """ Shake the booty emotes """
         print(f"> Command 'booty' called by: {ctx.author.name}")
-        booty_count = random.randint(1, 25)
+        booty_count = random.randint(1, 20)
 
         msg = ""
         for _ in range(1, booty_count):
