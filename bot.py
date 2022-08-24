@@ -171,6 +171,20 @@ class Bot(commands.Bot):
 
         await ctx.send(message)
 
+    @commands.command(name="bye")
+    async def bye(self, ctx: commands.Context):
+        """Say goodbye to a user in the chat"""
+        print(f"> Command 'bye' called by: {ctx.author.name}")
+        split = ctx.message.content.split("?bye")
+
+        message = f"See you next time @{ctx.author.display_name}! Thank you for being here {emoji['wave']}"
+        if len(split) >= 2 and len(split[1]) > 0:
+            args = split[1:]
+            args = " ".join(args)
+            message = f"Bye bye {args}! Thank you for being here! {emoji['wave']}"
+
+        await ctx.send(message)
+
     # Movie info
     # ===========================
     @commands.command(name="watching", aliases=["w", "movie", "video"])
