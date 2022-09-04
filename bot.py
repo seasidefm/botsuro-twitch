@@ -47,6 +47,7 @@ emoji = {
     "wave": "seasid3IsForWave",
     "booty": "seasid3IsForBootyDance",
     "talking": "🗣️",
+    "sparkle": "✨"
 }
 
 FAVE_NOT_RADIO = f"Thank you for the song interest! We're not in radio mode right now so please see the channel point redemptions for track id {emoji['pray']}"
@@ -168,6 +169,15 @@ class Bot(commands.Bot):
             msg += emoji.get("booty") + " "
 
         await ctx.send(msg)
+
+    @commands.command(name="bits")
+    async def bits(self, ctx: commands.Context):
+        """ Thank a user for bit donation """
+        target = " ".join(ctx.message.content.split("?bits"))
+        target = target if target != ' ' else ctx.author.display_name
+        message = f"Thank you for the bits {target} - you put a sparkle in my heart {emoji['sparkle']}{emoji['sparkle']}{emoji['sparkle']}"
+
+        await ctx.send(message)
 
     # Greetings
     # ===========================
