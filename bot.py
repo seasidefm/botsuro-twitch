@@ -1,8 +1,6 @@
 import random
-from ctypes import Union
 import os  # for importing env vars for the bot to use
 from time import time
-from unittest import result
 
 from twitchio.ext import commands
 
@@ -441,7 +439,7 @@ class Bot(commands.Bot):
         """
         command = "radio"
         username = ctx.author.display_name
-        print(f"> Command 'mod-flag' called by: {username}")
+        print(f"> Command 'radio' called by: {username}")
         if ctx.author.is_mod:
             content = self.strip_command(f"?{command}", ctx.message.content).strip()
             if content == "on":
